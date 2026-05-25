@@ -1,9 +1,7 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
-
 package com.mycompany.poepart1_2lr;
-
 /**
  *
  * @author Boikanyo
@@ -121,7 +119,7 @@ public boolean user_login() {
             System.out.print("  Enter cell number    : ");
             String inputPhone = login.nextLine();
 
-            if (inputUser.equals(storedUser_Name);
+            if (inputUser.equals(storedUser_Name)
                     && inputPassword.equals(storedPassword)
                     && inputPhone.equals(stored_phone)) {
                 System.out.println("\n  Login successful. Welcome back, " + storedUser_Name + "!");
