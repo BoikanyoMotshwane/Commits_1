@@ -9,6 +9,7 @@ package com.mycompany.poepart1_2lr;
  *
  * @author Boikanyo
  */
+
 import static java.lang.reflect.Array.get;
 import java.util.Arrays; 
 import java.util.Scanner;
@@ -16,133 +17,177 @@ import java.util.*;
 import java.util.ArrayList;
 import java.io.Console;
 import static java.lang.reflect.Array.get;
- 
-class messages {
-//Delaring the methods in the methods class
-    boolean checkMessageID;
-    String  checkRecipientCell;
-    String  createMessageHash;
-    String  SentMessage;
-    String  printMessages;
-    int     returnTotalMessages;
-    int     storedMessages;
-    public String recipientCell;
-    public String MessageID;
-    public String messageHash;
-    public Object sentMessages;
-     //Declaring the method for message IDs
-    public boolean checkMessageID(String MessageID) {
-        boolean isVaild = MessageID.length() == 10;
-         if(isVaild) {
-             System.out.println("Please ensure that the Message ID is not more than 10 characters");
-             this.MessageID = MessageID;
-             return true;
-         } else {
-             System.out.println("Message ID must be corrected to the 10 characters for the MessageID ");
-             return false;
-         }
-    }
-    //Declaring the method for recipient cell
-    public String checkRecipientCell(String RecipientCell) {
-        String recipientCell = null;
-         boolean isvalid = recipientCell.length() <=10 && recipientCell("+");
-        boolean isValid = false;
-         if (isValid) {
-            System.out.println("The recipient's cellphone number is successfully added");
-            this.recipientCell = recipientCell;
-            return recipientCell;
-         }else { 
-            System.out.println("The recipient's cellphone number is not added or is not correctly formatted and must contain (+27) and not more than 10 characters");
-             String invaild = null;
-            return invaild; 
-         }
-    }
-     //Declaring the method for message hash
-    public String createMessageHash(String message_id, String recipientCell, String message) {
-        String hashID = message_id.substring(0,1).toUpperCase();
-        String hashCell = recipientCell.substring(recipientCell.length() - 2);
-        String hashMessage = message.split(" ")[0].toUpperCase();
-       
-       String messageHash = hashID + ":" + hashCell + ":" + hashMessage;
-        String messagehash = null;
-       
-       System.out.println("Message hash successfully created: " + messagehash);
-       this.messageHash = messageHash;
-       return messageHash; 
-      }
-        //Declaring the method for String method hash     
-    public String SentMessage(String message_id, String recipientCell, String message) {
-         Scanner scanner = new Scanner(System.in);
-         //menu options 
-         System.out.println("\nWhat would you like to do with your messages?");
-         System.out.println("1.Send Message");
-         System.out.println("2.Store Message");
-         System.out.println("Disregard Message");
-         System.out.println("Enter your choice: ");
-         
-         String mychoice  = scanner.nextLine();
-         scanner.nextLine();
-    int choice = 0;
-         
-         switch (choice){
-             case 1:
-                 System.out.println("Message successfully sent.");
-                 System.out.println("Message ID: " + message_id);
-                 System.out.println("To:" + recipientCell);
-                 System.out.println("Message: " + message);
-             {
-                 String messageid = null;
-                 System.out.println("Hash: " + createMessageHash(messageid, recipientCell, message));
-             }
-                 return "Sent";
 
-             case 2:
-                 System.out.println("Message was successfully stored");
-                 return"Stored";
-             case 3:
-                 System.out.println("Message disregarded.");
-                 return"Disregareded";
-             default:
-                 System.out.println("Invaild option selected");
-                 return"Error";
-         } 
-    }
-        //Storing the arrays in the class    
-           '\String[] sendMessages = new get.sendMessages();\'
-           '\String[] messageIDs = new get.messageIDs();\'
-           '\String[] recipientcell  = new get.recipientcell();\'
-           '\String[] messageHashes = new get.messagesHashes();\'
-           
+public class Messages {
+    // Fields for a single message
+    private String messageID;
+    private String recipientCell;
+    private String messageText;
+    private String messageHash;
+    private int messageNumber;
 
-    //Method in the int and using a for loop for the sent and int total method 
-    public String printMessages() {
-        String printMessages = 0;
-        boolean isValid = true;
-        if(isValid) {           
-            return"No messages have been sent yet";
+    // Static list to store multiple messages (replacing the problematic arrays)
+    private static ArrayList<Messages> storedMessagesList = new ArrayList<>();
+
+    // Default constructor
+    public Messages() {}
+
+    // Constructor for creating a new message
+    public Messages(String recipientCell, String messageText, int messageNumber) {
+        this.recipientCell = recipientCell;
+        this.messageText = messageText;
+        this.messageNumber = messageNumber;
+        this.messageID = generateMessageID();
+        this.messageHash = createMessageHash(this.messageID, this.recipientCell, this.messageText);
+    }
+
+    // Generate a random 10-digit message ID
+    private String generateMessageID() {
+        Random rand = new Random();
+        long id = 1000000000L + (long) (rand.nextDouble() * 9000000000L);
+        return String.valueOf(id);
+    }
+
+    // Create a message hash based on ID, recipient, and message text
+    public String createMessageHash(String id, String cell, String text) {
+        String hashID = id.substring(0, 2).toUpperCase();
+        String hashCell = cell.length() >= 2 ? cell.substring(cell.length() - 2) : cell;
+        String[] words = text.trim().split("\\s+");
+        String firstWord = words[0].toUpperCase();
+        String lastWord = words[words.length - 1].toUpperCase();
+        
+        return hashID + ":" + hashCell + ":" + firstWord + lastWord;
+    }
+
+    // Getters
+    public String getMessageID() { return messageID; }
+    public String getRecipientCell() { return recipientCell; }
+    public String getMessageText() { return messageText; }
+    public String getMessageHash() { return messageHash; }
+
+    // Display details of a single message
+    public void displayFullDetails() {
+        
+        System.out.println("Message ID   : " + messageID);
+        System.out.println("Recipient    : " + recipientCell);
+        System.out.println("Message Hash : " + messageHash);
+        System.out.println("Message Text : " + messageText);
+    }
+
+    // Static method to handle the Stored Messages Menu
+    public static void storedMessageMenu(Scanner sc) {
+        int choice = 0;
+        do {
+            System.out.println("\n===== STORED MESSAGES MENU ======");
+            System.out.println("1) Display sender & recipient for all stored messages");
+            System.out.println("2) Display the longest stored message");
+            System.out.println("3) Search by Message ID");
+            System.out.println("4) Search all messages for a recipient");
+            System.out.println("5) Delete a message by hash");
+            System.out.println("6) Full view report of all stored messages");
+            System.out.println("7) Back to main menu");
+            System.out.print("Enter Option: ");
+
+            try {
+                choice = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number between 1-7.");
+                continue;
+            }
+
+            switch (choice) {
+                case 1: displaySenderAndRecipient(); 
+                break;
+                case 2: displayLongestMessage(); 
+                break;
+                case 3:
+                case 4: 
+                case 5: 
+                case 6: displayFullReport(); 
+                case 7: System.out.println("Returning to the Main menu..."); 
+                default: System.out.println("Please choose a valid option (1-7).");
+            }
+        } while (choice != 7);
+    }
+
+    // 1) Display recipient for all stored messages
+    public static void displaySenderAndRecipient() {
+        if (storedMessagesList.isEmpty()) {
+            System.out.println("No stored messages available.");
+            return;
+        }
+        System.out.println("\n--- Recipients of Stored Messages ---");
+        for (Messages m : storedMessagesList) {
+            System.out.println("Recipient: " + m.getRecipientCell());
+        }
+    }
+
+    // 2) Display the longest stored message
+    public static void displayLongestMessage() {
+        if (storedMessagesList.isEmpty()) {
+            System.out.println("No stored messages available.");
+            return;
+        }
+        Messages longest = storedMessagesList.get(0);
+        for (Messages m : storedMessagesList) {
+            if (m.getMessageText().length() > longest.getMessageText().length()) {
+                longest = m;
+            }
+        }
+        System.out.println("\n--- Longest Stored Message ---");
+        longest.displayFullDetails();
+    }
+
+    // 3) Search by Message ID
+    public static void searchByMessageID(String id) {
+        boolean found = false;
+        for (Messages m : storedMessagesList) {
+            if (m.getMessageID().equals(id)) {
+                m.displayFullDetails();
+                found = true;
+                break;
+            }
+        }
+        if (!found) System.out.println("No message found with ID: " + id);
+    }
+
+    // 4) Search all messages for a recipient
+    public static void searchByRecipient(String recipient) {
+        boolean found = false;
+        for (Messages m : storedMessagesList) {
+            if (m.getRecipientCell().equalsIgnoreCase(recipient)) {
+                m.displayFullDetails();
+                found = true;
+            }
+        }
+        if (!found) System.out.println("No messages found for recipient: " + recipient);
+    }
+
+    // 5) Delete a message by hash
+       public static void deleteByHash(String hash) {
+        boolean removed = storedMessagesList.removeIf(m -> m.getMessageHash().equalsIgnoreCase(hash));
+        if (removed) {
+            System.out.println("Message with hash " + hash + " has been deleted.");
         } else {
+            System.out.println("No message found with hash: " + hash);
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n--- All Sent Messages ----\n");
-        
-        for(int i = 0; i < sentMessages.length; i++) {
-            sb.append("Message" + (i + 1) + ":\n");
-            sb.apprend("ID: " + get.messageIDs(i));
-            sb.append("TO: " + get.recipient(i));
-            sb.append("Message: " + get.sentMessages(i));
-            sb.append("Hash: " + get.messageHashes(i));                   
-        }
-        
-        return sb.toString();
-    }
-    //Method in the int and using a for loop for the sent and int total method 
-    public int returnTotalMessages(){
-        int length = 0;
-        int sentMessages.length;
-        String total = null;
-        System.out.println("Total messages sent: " + total);
-        return 0;
-       }
+    }  
 
-public class Messages {  
+    // 6) Full view report of all stored messages
+    public static void displayFullReport() {
+        if (storedMessagesList.isEmpty()) {
+            System.out.println("No stored messages available.");
+            return;
+        }
+        System.out.println("\n===== FULL STORED MESSAGES REPORT =====");
+        System.out.println("Total stored messages: " + storedMessagesList.size());
+        for (Messages m : storedMessagesList) {
+            m.displayFullDetails();
+        }
+    }
+
+    // Method to add a message to the stored list (called from main)
+    public static void addMessage(Messages msg) {
+        storedMessagesList.add(msg);
+    }
 }
